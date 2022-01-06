@@ -58,7 +58,7 @@ func main() {
 }
 
 // get all users
-func GetUsersController(echo.Context) error {
+func GetUsersController(c echo.Context) error {
 	var users []User
 
 	if err := DB.Find(&users).Error; err != nil {

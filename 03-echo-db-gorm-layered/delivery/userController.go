@@ -1,6 +1,7 @@
 package delivery
 
 import (
+	"fmt"
 	"net/http"
 	"sirclo/restapi/db/gorm/datastore"
 
@@ -10,11 +11,11 @@ import (
 
 func CreateGetUsersController(db *gorm.DB) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		var users []datastore.User
-
-		if err := db.Find(&users).Error; err != nil {
-			return c.JSON(http.StatusBadRequest, map[string]interface{}{
-				"code":    400,
+		users, err := datastore.GetUsers(db)
+		if err != nil {
+			fmt.Println(err)
+			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+				"code":    http.StatusInternalServerError,
 				"status":  "failed",
 				"message": "failed to fetch data",
 			})
@@ -29,13 +30,20 @@ func CreateGetUsersController(db *gorm.DB) echo.HandlerFunc {
 func CreateAddUserController(db *gorm.DB) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		user := datastore.User{}
-		c.Bind(&user)
-
-		if err := db.Save(&user).Error; err != nil {
+		if err := c.Bind(&user); err != nil {
+			fmt.Println(err)
 			return c.JSON(http.StatusBadRequest, map[string]interface{}{
-				"code":    400,
+				"code":    http.StatusBadRequest,
 				"status":  "failed",
-				"message": "failed to fetch data",
+				"message": "Bad request",
+			})
+		}
+		if err := datastore.AddUser(db, &user); err != nil {
+			fmt.Println(err)
+			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+				"code":    http.StatusInternalServerError,
+				"status":  "failed",
+				"message": "failed to save data",
 			})
 		}
 		return c.JSON(http.StatusOK, map[string]interface{}{
