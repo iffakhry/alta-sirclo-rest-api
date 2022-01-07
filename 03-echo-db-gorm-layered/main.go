@@ -10,6 +10,7 @@ import (
 )
 
 func main() {
+	jwtSecret := os.Getenv("JWT_SECRET")
 	connectionString := os.Getenv("DB_CONNECTION_STRING")
 	fmt.Println(connectionString)
 	db, err := datastore.InitDB(connectionString)
@@ -20,7 +21,7 @@ func main() {
 		panic(err)
 	}
 	e := echo.New()
-	delivery.InitUserRoute(e, db)
+	delivery.InitUserRoute(e, db, jwtSecret)
 	// routing with query parameter
 
 	// start the server, and log if it fails

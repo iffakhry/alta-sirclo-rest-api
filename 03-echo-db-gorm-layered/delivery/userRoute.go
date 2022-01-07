@@ -19,24 +19,27 @@ func LogElapsedTime(handler echo.HandlerFunc) echo.HandlerFunc {
 	}
 }
 
-func InitUserRoute(e *echo.Echo, DB *gorm.DB) {
-	e.Pre(middleware.RemoveTrailingSlash())
-	e.Use(
-		middleware.Logger(),
-		middleware.BasicAuth(func(username, password string, c echo.Context) (bool, error) {
-			// echo dono:password | base64
-			if username == "dono" && password == "password" {
-				return true, nil
-			}
-			return false, nil
-		}),
-	)
+func InitUserRoute(e *echo.Echo, DB *gorm.DB, jwtSecret string) {
+	e.Pre(middleware.RemoveTrailingSlash(), middleware.Logger())
+	e.POST("/login", CreateLoginController(DB, jwtSecret))
+	e.GET("/users", CreateGetUsersController(DB, jwtSecret), middleware.JWT([]byte(jwtSecret)))
+	e.POST("/users", CreateAddUserController(DB))
+
+	// e.Use(
+	// 	middleware.Logger(),
+	// 	middleware.BasicAuth(func(username, password string, c echo.Context) (bool, error) {
+	// 		// echo dono:password | base64
+	// 		if username == "dono" && password == "password" {
+	// 			return true, nil
+	// 		}
+	// 		return false, nil
+	// 	}),
+	// )
 
 	// e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
 	// 	Format: `[${time_rfc3339}] ${status} ${method} ${host}${path} ${latency_human}` + "\n",
 	// }))
-	e.GET("/users", CreateGetUsersController(DB))
-	e.POST("/users", CreateAddUserController(DB))
+
 	// e.GET("/users", CreateGetUsersController(DB), middleware.Logger())
 	// e.POST("/users", CreateAddUserController(DB), LogElapsedTime)
 	// e.GET("/users/:id", GetUserController)
