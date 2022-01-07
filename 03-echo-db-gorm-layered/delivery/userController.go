@@ -67,9 +67,9 @@ func CreateGetUsersController(db *gorm.DB, jwtSecret string) echo.HandlerFunc {
 			})
 		}
 		return c.JSON(http.StatusOK, map[string]interface{}{
-			"message": "success get all users",
-			"users":   users,
-			"currentUser": currentUserName
+			"message":     "success get all users",
+			"users":       users,
+			"currentUser": currentUserName,
 		})
 	}
 }
