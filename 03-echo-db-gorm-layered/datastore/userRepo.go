@@ -23,7 +23,7 @@ func AddUser(db *gorm.DB, user *User) error {
 
 func GetUserByIdentity(db *gorm.DB, identity Identity) (User, error) {
 	var user User
-	if err := db.Find(&user).Where(identity).Error; err != nil {
+	if err := db.Where(identity).Find(&user).Error; err != nil {
 		// terjadi error waktu query
 		return user, err
 	}
