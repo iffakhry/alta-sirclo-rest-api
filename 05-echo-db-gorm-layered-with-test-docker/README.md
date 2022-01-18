@@ -27,7 +27,7 @@ docker pull <image-name>
 docker login -u <user-name>
 
 # build image
-docker build -t <tag> .
+docker build -t <image-name>[:tag] .
 
 # push image to container registry
 docker push <image-name>
