@@ -23,6 +23,7 @@ func InitUserRoute(e *echo.Echo, DB *gorm.DB, jwtSecret string) {
 	e.Pre(middleware.RemoveTrailingSlash(), middleware.Logger())
 	e.POST("/login", CreateLoginController(DB, jwtSecret))
 	e.GET("/users", CreateGetUsersController(DB, jwtSecret), middleware.JWT([]byte(jwtSecret)))
+	e.GET("/users/:id", CreateGetUserByIdController(DB, jwtSecret), middleware.JWT([]byte(jwtSecret)))
 	e.POST("/users", CreateAddUserController(DB))
 
 	// e.Use(

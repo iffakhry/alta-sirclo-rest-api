@@ -42,6 +42,7 @@ func CreateLoginController(db *gorm.DB, jwtSecret string) echo.HandlerFunc {
 		}
 		return c.JSON(http.StatusOK, map[string]interface{}{
 			"token": token,
+			"name":  user.Name,
 		})
 	}
 }

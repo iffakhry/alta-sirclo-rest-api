@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"sirclo/restapi/db/gorm/datastore"
+	"strconv"
 
 	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
@@ -71,6 +72,36 @@ func CreateGetUsersController(db *gorm.DB, jwtSecret string) echo.HandlerFunc {
 		return c.JSON(http.StatusOK, map[string]interface{}{
 			"message":     "success get all users",
 			"users":       users,
+			"currentUser": currentUserName,
+		})
+	}
+}
+
+func CreateGetUserByIdController(db *gorm.DB, jwtSecret string) echo.HandlerFunc {
+	// result.Scan()
+	return func(c echo.Context) error {
+		currentUserName, err := GetUserName(jwtSecret, c)
+		if err != nil {
+			fmt.Println(err)
+			return c.JSON(http.StatusUnauthorized, map[string]interface{}{
+				"code":    http.StatusUnauthorized,
+				"status":  "unauthorized",
+				"message": "unauthorized access",
+			})
+		}
+		idParam, _ := strconv.Atoi(c.Param("id"))
+		user, err := datastore.GetUserById(db, idParam)
+		if err != nil {
+			fmt.Println(err)
+			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+				"code":    http.StatusInternalServerError,
+				"status":  "failed",
+				"message": "failed to fetch data",
+			})
+		}
+		return c.JSON(http.StatusOK, map[string]interface{}{
+			"message":     "success get users",
+			"user":        user,
 			"currentUser": currentUserName,
 		})
 	}
