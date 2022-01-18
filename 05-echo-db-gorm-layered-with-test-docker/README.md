@@ -24,13 +24,13 @@ Common commands
 docker pull <image-name>
 
 # login to container registry
-docker login
-
-# push image to container registry
-docker push <image-name>
+docker login -u <user-name>
 
 # build image
 docker build -t <tag> .
+
+# push image to container registry
+docker push <image-name>
 
 # create and run container
 docker run -p <host-port>:<container-port> -e <env-name>=<env-value> -v <host-volume>:<container-volume> --name <container-name> <image-name>
@@ -59,3 +59,38 @@ docker ps -a
 docker exec -it <container-name> <command>
 docker exec -it mysql bash
 ```
+
+# Using docker
+
+If you are using docker-desktop, the containers can access host os by using `host.docker.internal` name.
+
+Otherwise, you can use default host IP address: `172.17.0.1`
+
+```bash
+# create and run appDb container
+docker run -p 3307:3306 \
+-e MYSQL_ROOT_PASSWORD=toor \
+-e MYSQL_DATABASE=alta \
+--name appDb  \
+-d \
+mysql
+
+# create and run appContainer
+docker run -p 3000:8080 \
+-e DB_CONNECTION_STRING='root:toor@tcp(172.17.0.1:3307)/alta?charset=utf8&parseTime=True&loc=Local' \
+-e JWT_SECRET=rahasia \
+--name app  \
+-d \
+gofrendi/alta-sirclo
+```
+
+![container-architecture](images/container-architecture.png)
+
+# Using docker compose
+
+```bash
+docker-compose up
+docker-compose down
+```
+
+When you are using docker-compose, each container can recognize each other's by using their respective service's name.

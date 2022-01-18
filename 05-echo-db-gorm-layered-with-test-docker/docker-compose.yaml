@@ -1,0 +1,32 @@
+services:
+
+  appDb:
+    image: bitnami/mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: toor
+      MYSQL_DATABASE: alta
+    ports: 
+      - 3306:3306
+    healthcheck:
+      test: ["CMD", "mysql", "-u", "root",  "-ptoor", "-e", "show schemas"]
+      interval: 10s 
+
+  app:
+    # build: .
+    image: gofrendi/alta-sirclo
+    restart: always
+    depends_on:
+      appDb:
+        condition: service_healthy
+    environment:
+      JWT_SECRET: secret
+      DB_CONNECTION_STRING: root:toor@tcp(appDb:3306)/alta?charset=utf8&parseTime=True&loc=Local
+    ports:
+      - 8080:8080
+
+  adminer:
+    image: adminer
+    restart: always
+    ports: # host:container
+      - 8081:8080
